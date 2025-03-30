@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Diff Editor</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #2563eb;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 10px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .instructions {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #2563eb;
+    }
+    .editor-container {
+      display: flex;
+      gap: 20px;
+    }
+    .original-code, .diff-editor, .preview-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    textarea {
+      height: 400px;
+      font-family: monospace;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+      font-size: 14px;
+      resize: vertical;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    button.secondary {
+      background-color: #f3f4f6;
+      color: #333;
+      border: 1px solid #d1d5db;
+    }
+    button.secondary:hover {
+      background-color: #e5e7eb;
+    }
+    button.success {
+      background-color: #10b981;
+    }
+    button.success:hover {
+      background-color: #059669;
+    }
+    button.warning {
+      background-color: #f59e0b;
+    }
+    button.warning:hover {
+      background-color: #d97706;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .actions-container {
+      margin-top: 20px;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .error {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    .warning {
+      background-color: #ffedd5;
+      color: #9a3412;
+    }
+    .info {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .steps {
+      margin-top: 10px;
+    }
+    .steps ol {
+      padding-left: 25px;
+    }
+    .filename {
+      font-family: monospace;
+      background-color: #f3f4f6;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .diff-line {
+      font-family: monospace;
+      white-space: pre;
+      line-height: 1.5;
+      padding: 2px 4px;
+      border-radius: 2px;
+      margin: 0;
+    }
+    .diff-add {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .diff-remove {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    .diff-info {
+      background-color: #f3f4f6;
+      color: #6b7280;
+    }
+    .diff-container {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 10px;
+      overflow: auto;
+      max-height: 400px;
+      font-size: 14px;
+    }
+    .examples-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .example-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 10px;
+      width: calc(33.33% - 10px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: #f8fafc;
+    }
+    .example-card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .example-card h4 {
+      margin-top: 0;
+      color: #2563eb;
+    }
+    .example-card p {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 10px;
+    }
+    .tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+    }
+    .tab.active {
+      border-bottom: 2px solid #2563eb;
+      color: #2563eb;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    #backups-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .backup-item {
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .backup-item:hover {
+      background-color: #f8fafc;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+    }
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .toggle-label {
+      margin-right: 10px;
+      font-weight: normal;
+    }
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+      background-color: #2563eb;
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+    }
+    .hidden {
+      display: none;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mcp-badge {
+      background-color: #2563eb;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    @media (max-width: 768px) {
+      .editor-container {
+        flex-direction: column;
+      }
+      .original-code, .diff-editor, .preview-panel {
+        width: 100%;
+      }
+      .example-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-bar">
+      <h1>MCP Diff Editor</h1>
+      <span class="mcp-badge">MCP Integration</span>
+    </div>
+    
+    <div class="instructions">
+      <h2>Instructions</h2>
+      <p>This tool allows you to modify files with diff preview capabilities. You are currently editing <span class="filename" id="current-filename">loading...</span></p>
+      <div class="steps">
+        <ol>
+          <li>The original content of the file will be loaded in the left panel.</li>
+          <li>Paste your code diff or the entire modified file in the right panel.</li>
+          <li>Use "Preview Changes" to see what the changes will look like before applying.</li>
+          <li>Click "Apply Changes" to update the file.</li>
+          <li>The status will show if the operation was successful.</li>
+        </ol>
+      </div>
+      <div class="toggle-container">
+        <span class="toggle-label">Show Examples:</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-examples">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div id="examples-section" class="hidden">
+      <h3>Diff Examples</h3>
+      <p>Click on an example to see how diff format works:</p>
+      <div class="examples-container" id="examples-container">
+        <!-- Examples will be loaded here -->
+      </div>
+    </div>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="edit">Edit Mode</div>
+      <div class="tab" data-tab="backups">Backups</div>
+    </div>
+    
+    <div id="edit-tab" class="tab-content active">
+      <div class="editor-container">
+        <div class="original-code">
+          <label for="original">Current Content:</label>
+          <textarea id="original" readonly></textarea>
+          <div class="button-container">
+            <button id="load-file">Reload File</button>
+            <button id="refresh">Refresh</button>
+          </div>
+        </div>
+        
+        <div class="diff-editor">
+          <label for="modified">New Content or Diff:</label>
+          <textarea id="modified" placeholder="Paste your modified code or diff here..."></textarea>
+          <div class="button-container">
+            <button id="preview-changes" class="secondary">Preview Changes</button>
+            <button id="apply-changes" class="success">Apply Changes</button>
+            <button id="clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="preview-panel hidden" id="preview-panel">
+          <label for="preview">Preview of Changes:</label>
+          <div class="diff-container" id="diff-preview"></div>
+          <div class="button-container">
+            <button id="close-preview" class="secondary">Close Preview</button>
+            <button id="apply-preview" class="success">Apply These Changes</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="actions-container">
+        <h3>Additional Actions</h3>
+        <div class="button-container">
+          <button id="backup" class="secondary">Create Backup</button>
+          <button id="restore-original" class="warning">Restore Original</button>
+          <div class="tooltip">
+            <button id="help" class="secondary">Help</button>
+            <span class="tooltip-text">Use diffs to make targeted changes to specific parts of the file, or paste the entire content to replace everything.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="backups-tab" class="tab-content">
+      <h3>Available Backups</h3>
+      <p>Select a backup to restore it:</p>
+      <button id="refresh-backups" class="secondary">Refresh Backups</button>
+      <div id="backups-list">
+        <!-- Backups will be loaded here -->
+      </div>
+    </div>
+    
+    <div id="status" class="status" style="display: none;"></div>
+  </div>
+  
+  <script>
+    // Parse URL query parameters to get the target file
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+    
+    // File path constants
+    const TARGET_FILE = getQueryParam('file') || 'index.html'; // Default to index.html if no file specified
+    const BACKUP_FILE = `${TARGET_FILE}.backup`;
+    
+    // Update the current filename display
+    document.getElementById('current-filename').textContent = TARGET_FILE;
+    
+    // DOM Elements
+    const originalTextarea = document.getElementById('original');
+    const modifiedTextarea = document.getElementById('modified');
+    const previewPanel = document.getElementById('preview-panel');
+    const diffPreview = document.getElementById('diff-preview');
+    const loadFileBtn = document.getElementById('load-file');
+    const refreshBtn = document.getElementById('refresh');
+    const previewChangesBtn = document.getElementById('preview-changes');
+    const applyChangesBtn = document.getElementById('apply-changes');
+    const closePreviewBtn = document.getElementById('close-preview');
+    const applyPreviewBtn = document.getElementById('apply-preview');
+    const clearBtn = document.getElementById('clear');
+    const backupBtn = document.getElementById('backup');
+    const restoreBtn = document.getElementById('restore-original');
+    const statusDiv = document.getElementById('status');
+    const toggleExamples = document.getElementById('toggle-examples');
+    const examplesSection = document.getElementById('examples-section');
+    const examplesContainer = document.getElementById('examples-container');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const refreshBackupsBtn = document.getElementById('refresh-backups');
+    const backupsList = document.getElementById('backups-list');
+    
+    // Helper function to show status messages
+    function showStatus(message, type = 'success') {
+      statusDiv.textContent = message;
+      statusDiv.style.display = 'block';
+      
+      // Remove all status classes first
+      statusDiv.classList.remove('success', 'error', 'warning', 'info');
+      
+      // Add the appropriate class
+      statusDiv.classList.add(type);
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Load file content
+    async function loadFileContent() {
+      try {
+        const response = await fetch(`/read-file/${TARGET_FILE}`);
+        if (!response.ok) {
+          throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
+        }
+        
+        const content = await response.text();
+        originalTextarea.value = content;
+        showStatus(`Successfully loaded ${TARGET_FILE}`, 'success');
+      } catch (error) {
+        showStatus(`Error loading file: ${error.message}`, 'error');
+        console.error('Error loading file:', error);
+      }
+    }
+    
+    // Preview changes before applying them
+    async function previewChanges() {
+      if (!modifiedTextarea.value.trim()) {
+        showStatus('Please provide the modified code or diff', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/preview-changes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            filename: TARGET_FILE,
+            content: modifiedTextarea.value
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to preview changes: ${response.status} ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        // Format the diff nicely for display
+        let formattedDiff = '';
+        if (result.diff) {
+          const diffLines = result.diff.split('\n');
+          diffLines.forEach(line => {
+            let className = 'diff-line';
+            if (line.startsWith('+')) {
+              className += ' diff-add';
+            } else if (line.startsWith('-')) {
+              className += ' diff-remove';
+            } else if (line.startsWith('@@') || line.startsWith('---') || line.startsWith('+++')) {
+              className += ' diff-info';
+            }
+            formattedDiff += `<div class="${className}">${escapeHtml(line)}</div>`;
+          });
+        } else {
+          formattedDiff = '<div class="diff-info">No differences detected or complete file replacement.</div>';
+        }
+        
+        diffPreview.innerHTML = formattedDiff;
+        
+        // Show the preview panel, hide the original content panel
+        document.querySelector('.original-code').classList.add('hidden');
+        previewPanel.classList.remove('hidden');
+        
+        showStatus(`Preview generated${result.isDiff ? ' (diff detected)' : ' (full file replacement)'}`, 'info');
+      } catch (error) {
+        showStatus(`Error previewing changes: ${error.message}`, 'error');
+        console.error('Error previewing changes:', error);
+      }
+    }
+    
+    // Close preview and show original content again
+    function closePreview() {
+      document.querySelector('.original-code').classList.remove('hidden');
+      previewPanel.classList.add('hidden');
+    }
+    
+    // Apply changes to the file
+    async function applyChanges() {
+      if (!modifiedTextarea.value.trim()) {
+        showStatus('Please provide the modified code or diff', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/update-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            filename: TARGET_FILE,
+            content: modifiedTextarea.value
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to update file: ${response.status} ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        showStatus(`Successfully updated ${TARGET_FILE}${result.isDiff ? ' using diff' : ''} (Backup: ${result.backupCreated ? 'Yes' : 'No'})`, 'success');
+        
+        // Close preview if open
+        closePreview();
+        
+        // Reload the original file content after update
+        setTimeout(loadFileContent, 1000);
+      } catch (error) {
+        showStatus(`Error updating file: ${error.message}`, 'error');
+        console.error('Error updating file:', error);
+      }
+    }
+    
+    // Create a backup of the file
+    async function createBackup() {
+      try {
+        const response = await fetch('/backup-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            source: TARGET_FILE,
+            destination: BACKUP_FILE
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to create backup: ${response.status} ${response.statusText}`);
+        }
+        
+        showStatus(`Successfully created backup at ${BACKUP_FILE}`, 'success');
+      } catch (error) {
+        showStatus(`Error creating backup: ${error.message}`, 'error');
+        console.error('Error creating backup:', error);
+      }
+    }
+    
+    // Restore from backup
+    async function restoreOriginal() {
+      try {
+        const response = await fetch('/restore-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            source: BACKUP_FILE,
+            destination: TARGET_FILE
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to restore: ${response.status} ${response.statusText}`);
+        }
+        
+        showStatus(`Successfully restored ${TARGET_FILE} from backup`, 'success');
+        setTimeout(loadFileContent, 1000);
+      } catch (error) {
+        showStatus(`Error restoring file: ${error.message}`, 'error');
+        console.error('Error restoring file:', error);
+      }
+    }
+    
+    // Load diff examples
+    async function loadExamples() {
+      try {
+        const response = await fetch('/examples');
+        if (!response.ok) {
+          throw new Error(`Failed to load examples: ${response.status} ${response.statusText}`);
+        }
+        
+        const examples = await response.json();
+        
+        // Clear the container
+        examplesContainer.innerHTML = '';
+        
+        // Add examples
+        examples.forEach(example => {
+          const exampleCard = document.createElement('div');
+          exampleCard.className = 'example-card';
+          exampleCard.innerHTML = `
+            <h4>${example.name}</h4>
+            <p>${example.description}</p>
+            <button class="secondary">Use This Example</button>
+          `;
+          
+          exampleCard.querySelector('button').addEventListener('click', () => {
+            modifiedTextarea.value = example.diff;
+            showStatus(`Example "${example.name}" loaded into the editor`, 'info');
+          });
+          
+          examplesContainer.appendChild(exampleCard);
+        });
+      } catch (error) {
+        showStatus(`Error loading examples: ${error.message}`, 'warning');
+        console.error('Error loading examples:', error);
+      }
+    }
+    
+    // Load available backups
+    async function loadBackups() {
+      try {
+        const response = await fetch(`/backups/${TARGET_FILE}`);
+        if (!response.ok) {
+          throw new Error(`Failed to load backups: ${response.status} ${response.statusText}`);
+        }
+        
+        const backups = await response.json();
+        
+        // Clear the container
+        backupsList.innerHTML = '';
+        
+        if (backups.length === 0) {
+          backupsList.innerHTML = '<p>No backups available.</p>';
+          return;
+        }
+        
+        // Add backups
+        backups.forEach(backup => {
+          const backupItem = document.createElement('div');
+          backupItem.className = 'backup-item';
+          
+          // Format the timestamp for display
+          const timestamp = backup.timestamp.replace(/T/, ' ').replace(/\-/g, '/').replace(/\..+/, '');
+          
+          backupItem.innerHTML = `
+            <div>
+              <div>${backup.filename}</div>
+              <div class="text-sm text-gray-500">${timestamp}</div>
+            </div>
+            <button class="secondary">Restore</button>
+          `;
+          
+          backupItem.querySelector('button').addEventListener('click', async () => {
+            try {
+              const response = await fetch('/restore-file', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  source: backup.path,
+                  destination: TARGET_FILE
+                })
+              });
+              
+              if (!response.ok) {
+                throw new Error(`Failed to restore: ${response.status} ${response.statusText}`);
+              }
+              
+              showStatus(`Successfully restored ${TARGET_FILE} from backup ${timestamp}`, 'success');
+              setTimeout(loadFileContent, 1000);
+            } catch (error) {
+              showStatus(`Error restoring from backup: ${error.message}`, 'error');
+              console.error('Error restoring from backup:', error);
+            }
+          });
+          
+          backupsList.appendChild(backupItem);
+        });
+      } catch (error) {
+        showStatus(`Error loading backups: ${error.message}`, 'warning');
+        console.error('Error loading backups:', error);
+      }
+    }
+    
+    // Escape HTML special characters for safe display
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    
+    // Event Listeners
+    loadFileBtn.addEventListener('click', loadFileContent);
+    refreshBtn.addEventListener('click', loadFileContent);
+    previewChangesBtn.addEventListener('click', previewChanges);
+    closePreviewBtn.addEventListener('click', closePreview);
+    applyChangesBtn.addEventListener('click', applyChanges);
+    applyPreviewBtn.addEventListener('click', applyChanges);
+    clearBtn.addEventListener('click', () => {
+      modifiedTextarea.value = '';
+      showStatus('Cleared the modification textarea', 'info');
+    });
+    backupBtn.addEventListener('click', createBackup);
+    restoreBtn.addEventListener('click', restoreOriginal);
+    refreshBackupsBtn.addEventListener('click', loadBackups);
+    
+    // Toggle examples section
+    toggleExamples.addEventListener('change', function() {
+      if (this.checked) {
+        examplesSection.classList.remove('hidden');
+        loadExamples();
+      } else {
+        examplesSection.classList.add('hidden');
+      }
+    });
+    
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+        
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show active tab content
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+          if (content.id === `${tabName}-tab`) {
+            content.classList.add('active');
+          }
+        });
+        
+        // Load backups if on backups tab
+        if (tabName === 'backups') {
+          loadBackups();
+        }
+      });
+    });
+    
+    // Load the file when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFileContent();
+      showStatus(`Welcome to the MCP Diff Editor! Currently editing: ${TARGET_FILE}. Use "Preview Changes" to see what your changes will do before applying them.`, 'info');
+    });
+  </script>
+</body>
+</html> 

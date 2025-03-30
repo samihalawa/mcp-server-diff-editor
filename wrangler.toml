@@ -1,0 +1,15 @@
+name = "mcp-diff-editor"
+main = "cloudflare-worker.js"
+compatibility_date = "2023-11-01"
+
+[vars]
+# You can set environment variables here
+ENVIRONMENT = "production"
+
+# [kv_namespaces]
+# Add KV namespace bindings here if needed
+# MY_KV = { binding = "MY_KV", id = "xxxx" }
+
+# Example route to deploy this worker to a custom domain
+# [routes]
+# route = "diff-editor.your-domain.com/*" 
