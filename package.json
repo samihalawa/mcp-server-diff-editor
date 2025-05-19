@@ -10,7 +10,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "scripts": {
+    "build": "tsc && shx chmod +x build/index.js",
+    "start": "node build/index.js",
+    "prepare": "npm run build",
+    "dev": "npm run build && npm start",
+    "test": "node scripts/test-mcp.js"
+  },  "dependencies": {
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^4.21.2"

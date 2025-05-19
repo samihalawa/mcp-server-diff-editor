@@ -236,7 +236,7 @@ fetch('https://your-worker.your-subdomain.workers.dev/apply', {
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
           
-        formattedDiff += `<div class="${className}">${escapedLine}</div>`;
+        formattedDiff += '<div class="' + className + '">' + escapedLine + '</div>';
       });
       
       diffPreview.innerHTML = formattedDiff;

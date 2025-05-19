@@ -2,6 +2,9 @@ name = "mcp-diff-editor"
 main = "cloudflare-worker.js"
 compatibility_date = "2023-11-01"
 
+# Your Cloudflare account ID (required)
+account_id = "21d8251b2204f8dfa7df681246d76705"
+
 [vars]
 # You can set environment variables here
 ENVIRONMENT = "production"
