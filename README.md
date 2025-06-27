@@ -1,84 +1,102 @@
-# MCP Diff Editor
+# 🔧 MCP Server Diff Editor - Advanced Code Comparison & Merge Tool for AI Assistants
 
-A powerful MCP-integrated diff editor for modifying files with preview capabilities.
+**Powerful Model Context Protocol server for intelligent code diff analysis, file comparison, and automated merge operations through AI assistants.**
 
-## Features
+## 🚀 Overview
 
-- Edit files through a web interface with real-time diff preview
-- Apply changes using unified diff format or complete file replacement
-- Create backups automatically before making changes
-- Restore from previous backups
-- View examples of common diff operations
-- Security controls to prevent unauthorized file access
+MCP Server Diff Editor provides AI assistants with advanced code comparison, diff analysis, and intelligent merge capabilities. Perfect for code reviews, version control operations, and automated file synchronization workflows.
 
-## Usage as MCP
+## ⭐ Key Features
 
-The MCP diff editor provides the following methods:
+- **📊 Advanced Diff Analysis** - Intelligent code comparison with syntax highlighting
+- **🔀 Smart Merge Operations** - Automated conflict resolution and merge strategies
+- **📝 Multi-Format Support** - Support for various file types and programming languages
+- **🎯 Semantic Comparison** - Beyond line-by-line, understand code structure changes
+- **📈 Visual Diff Rendering** - Generate visual diff representations
+- **🔍 Pattern Recognition** - Identify common refactoring patterns and changes
 
-### `start`
-Start the diff editor server
+## 🛠️ Available Tools
 
-### `stop`
-Stop the diff editor server
+### Diff Operations
+- `compare_files` - Compare two files and generate detailed diff
+- `compare_directories` - Recursive directory comparison
+- `analyze_changes` - Semantic analysis of code changes
+- `generate_patch` - Create patch files from differences
 
-### `status`
-Check server status
+### Merge Operations
+- `merge_files` - Intelligent file merging with conflict resolution
+- `resolve_conflicts` - Automated conflict resolution strategies
+- `apply_patch` - Apply patch files to target files
+- `preview_merge` - Preview merge results before applying
 
-### `edit_file`
-Open the diff editor for a specific file
-- Parameters:
-  - `file_path`: Path to the file to edit
+### Analysis Tools
+- `detect_patterns` - Identify refactoring and change patterns
+- `calculate_similarity` - Measure file similarity scores
+- `extract_changes` - Extract specific types of changes
+- `generate_summary` - Create human-readable change summaries
 
-### `apply_diff`
-Apply a diff to a file
-- Parameters:
-  - `file_path`: Path to the file to modify
-  - `diff_content`: Diff content to apply
+## 🚀 Quick Start
 
-### `preview_diff`
-Preview a diff without applying it
-- Parameters:
-  - `file_path`: Path to the file to preview changes for
-  - `diff_content`: Diff content to preview
+```bash
+# Install dependencies
+npm install
 
-## Example Usage
+# Start the MCP server
+npm start
 
-```javascript
-const mcp = require('mcp');
-const diffEditor = mcp.get('diff_editor');
-
-// Start the server
-await diffEditor.start();
-
-// Open the editor for a specific file
-const result = await diffEditor.edit_file({
-  file_path: '/path/to/your/file.txt'
-});
-
-// Get the URL to access the editor
-console.log(result.url);
-
-// Apply a diff to a file
-await diffEditor.apply_diff({
-  file_path: '/path/to/your/file.txt',
-  diff_content: `@@ -5,7 +5,7 @@
-   <title>Sample Page</title>
- </head>
- <body>
--  <h1>Welcome to our website</h1>
-+  <h1>Welcome to our awesome website!</h1>
-   <p>Thanks for visiting us.</p>
- </body>
- </html>`
-});
+# Example usage through MCP client
+compare_files(file1="old_version.js", file2="new_version.js")
 ```
 
-## Environment Variables
+## 📖 Use Cases
 
-- `PORT`: HTTP port (default: 3009)
-- `MCP_FILE_DIR`: Directory to use as base for file operations (default: current directory)
-- `MCP_ALLOW_ANY_PATH`: Set to 'true' to allow accessing files outside the working directory
+- **Code Reviews** - Automated code review assistance and analysis
+- **Version Control** - Enhanced Git operations and merge conflict resolution
+- **File Synchronization** - Intelligent file sync with change detection
+- **Refactoring Analysis** - Track and analyze code refactoring patterns
+- **Documentation Updates** - Compare and merge documentation changes
+- **Configuration Management** - Track configuration file changes
 
-## Installation
+## 🔧 Supported File Types
 
-This module is intended to be used as an MCP in the `/Users/samihalawa/Documents/MCP` directory and should be automatically available in the MCP interface after installation. 
+### Programming Languages
+- **JavaScript/TypeScript** - Advanced syntax-aware comparison
+- **Python** - Semantic diff with function-level analysis
+- **Java/C#** - Object-oriented code structure comparison
+- **HTML/CSS** - Web markup and styling diff analysis
+- **JSON/YAML** - Structured data comparison
+- **Markdown** - Documentation diff with formatting preservation
+
+### Configuration Files
+- **Package.json** - Dependency change analysis
+- **Docker files** - Container configuration comparison
+- **CI/CD configs** - Pipeline configuration diff analysis
+
+## 🎯 Advanced Features
+
+- **Syntax-Aware Diffing** - Understand code structure, not just text
+- **Intelligent Conflict Resolution** - AI-powered merge conflict resolution
+- **Change Impact Analysis** - Assess the impact of code changes
+- **Refactoring Detection** - Identify moved, renamed, and restructured code
+- **Custom Diff Algorithms** - Configurable comparison strategies
+- **Integration Ready** - Easy integration with existing development workflows
+
+## 📊 Diff Algorithms
+
+- **Myers Algorithm** - Standard line-based diff algorithm
+- **Patience Diff** - Better handling of code reorganization
+- **Histogram Diff** - Optimized for large files
+- **Semantic Diff** - Structure-aware comparison for code
+- **Word-level Diff** - Fine-grained text comparison
+
+## 🏷️ Tags
+
+`diff-editor` `code-comparison` `merge-tool` `mcp-server` `version-control` `git-integration` `code-review` `file-comparison` `conflict-resolution` `ai-assistant` `claude-desktop` `development-tools` `code-analysis` `refactoring-tools` `patch-management` `syntax-highlighting` `semantic-diff`
+
+## 📄 License
+
+MIT License - Built for intelligent code comparison and merge operations.
+
+---
+
+**Empowering AI assistants with advanced code diff analysis and intelligent merge capabilities** 🔧
