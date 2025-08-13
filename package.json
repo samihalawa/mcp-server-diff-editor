@@ -2,23 +2,27 @@
   "name": "mcp-server-diff-editor",
   "version": "1.0.0",
   "description": "",
-  "main": "mcp-diff-editor.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "main": "build/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc && shx chmod +x build/index.js",
     "start": "node build/index.js",
     "prepare": "npm run build",
     "dev": "npm run build && npm start",
     "test": "node scripts/test-mcp.js"
-  },  "dependencies": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "shx": "^0.4.0",
+    "typescript": "^5.9.2"
   }
 }

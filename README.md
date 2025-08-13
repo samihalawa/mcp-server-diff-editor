@@ -17,36 +17,116 @@ MCP Server Diff Editor provides AI assistants with advanced code comparison, dif
 
 ## 🛠️ Available Tools
 
-### Diff Operations
-- `compare_files` - Compare two files and generate detailed diff
-- `compare_directories` - Recursive directory comparison
-- `analyze_changes` - Semantic analysis of code changes
-- `generate_patch` - Create patch files from differences
+### diff_editor_tool
 
-### Merge Operations
-- `merge_files` - Intelligent file merging with conflict resolution
-- `resolve_conflicts` - Automated conflict resolution strategies
-- `apply_patch` - Apply patch files to target files
-- `preview_merge` - Preview merge results before applying
+The server provides a single powerful tool with multiple operations:
 
-### Analysis Tools
-- `detect_patterns` - Identify refactoring and change patterns
-- `calculate_similarity` - Measure file similarity scores
-- `extract_changes` - Extract specific types of changes
-- `generate_summary` - Create human-readable change summaries
+#### Operations
 
-## 🚀 Quick Start
+- **`diff`** - Compare original and modified text content
+- **`merge`** - Combine original and modified text versions  
+- **`apply`** - Apply changes to existing content
+
+#### Parameters
+
+```typescript
+{
+  operation: "diff" | "merge" | "apply",  // Required
+  original?: string,                      // Original text content
+  modified?: string                       // Modified text content
+}
+```
+
+## 📝 Usage Examples
+
+### Basic Diff Comparison
+
+```
+Use the diff editor tool to compare these files:
+Operation: diff
+Original: "function hello() {\n  console.log('Hello world');\n}"
+Modified: "function hello() {\n  console.log('Hello Claude!');\n}"
+```
+
+### Merge Operation
+
+```
+Use the diff editor to merge these versions:
+Operation: merge
+Original: "const name = 'World';"
+Modified: "const name = 'Claude';"
+```
+
+### Apply Changes
+
+```
+Apply these changes to the content:
+Operation: apply
+Original: "# My Project\n\nBasic description"
+```
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+- Node.js 18+ 
+- Claude Code CLI (for easy setup)
+
+### 1. Build the Server
 
 ```bash
-# Install dependencies
+# Clone and setup
+git clone <repository-url>
+cd mcp-server-diff-editor
+
+# Install dependencies and build
 npm install
+npm run build
 
-# Start the MCP server
+# Test the server
 npm start
-
-# Example usage through MCP client
-compare_files(file1="old_version.js", file2="new_version.js")
 ```
+
+### 2. Add to Claude Code CLI
+
+#### Method 1: Using Claude MCP CLI (Recommended)
+
+```bash
+# Add to current project
+claude mcp add diff-editor node {mcp-server-diff-editor-path}/build/index.js
+
+# Add globally for all projects
+claude mcp add --user diff-editor node {mcp-server-diff-editor-path}/build/index.js
+
+# Verify installation
+claude mcp list
+```
+
+#### Method 2: Manual Configuration
+
+Create or update `.mcp.json` in your project directory:
+
+```json
+{
+  "mcpServers": {
+    "diff-editor": {
+      "command": "node",
+      "args": ["{mcp-server-diff-editor-path}/build/index.js"],
+      "env": {}
+    }
+  }
+}
+```
+
+### 3. Verify Installation
+
+After adding the server, restart Claude Code and test:
+
+```
+Test the diff editor:
+Use the diff editor tool to compare "Hello World" with "Hello Claude"
+```
+
+You should see the tool successfully compare the two strings and provide diff output.
 
 ## 📖 Use Cases
 
@@ -81,13 +161,104 @@ compare_files(file1="old_version.js", file2="new_version.js")
 - **Custom Diff Algorithms** - Configurable comparison strategies
 - **Integration Ready** - Easy integration with existing development workflows
 
-## 📊 Diff Algorithms
+## 🔧 Development
 
-- **Myers Algorithm** - Standard line-based diff algorithm
-- **Patience Diff** - Better handling of code reorganization
-- **Histogram Diff** - Optimized for large files
-- **Semantic Diff** - Structure-aware comparison for code
-- **Word-level Diff** - Fine-grained text comparison
+### Project Structure
+
+```
+mcp-server-diff-editor/
+├── src/
+│   └── index.ts          # Main server implementation
+├── build/                # Compiled TypeScript output
+│   ├── index.js         # Executable server file
+│   └── index.d.ts       # Type definitions
+├── .mcp.json            # MCP server configuration
+├── package.json         # Node.js dependencies and scripts
+├── tsconfig.json        # TypeScript configuration
+└── README.md           # This documentation
+```
+
+### Development Scripts
+
+```bash
+# Install dependencies
+npm install
+
+# Build TypeScript
+npm run build
+
+# Start development server
+npm run dev
+
+# Run tests
+npm test
+```
+
+### Extending the Server
+
+To add new operations, modify `src/index.ts`:
+
+```typescript
+// Add new operation to the enum
+enum: ['diff', 'merge', 'apply', 'your-operation']
+
+// Add handler in CallToolRequestSchema
+case 'your-operation':
+  return {
+    content: [{ type: 'text', text: 'Your operation result' }]
+  };
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Server not found in Claude Code:**
+```bash
+# Verify server path exists
+ls -la {mcp-server-diff-editor-path}/build/index.js
+
+# Rebuild if missing
+npm run build
+```
+
+**Permission denied errors:**
+```bash
+# Make server executable
+chmod +x build/index.js
+
+# Check Node.js version (requires 18+)
+node --version
+```
+
+**TypeScript compilation errors:**
+```bash
+# Clean build directory
+rm -rf build/
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+**MCP connection issues:**
+```bash
+# Test server directly
+echo '{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "test", "version": "1.0.0"}}}' | node build/index.js
+
+# Check Claude Code MCP configuration
+claude mcp list
+claude mcp get diff-editor
+```
+
+### Debug Mode
+
+Enable detailed logging by setting environment variables:
+
+```bash
+DEBUG=1 NODE_ENV=development npm start
+```
 
 ## 🏷️ Tags
 

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "diff-editor": {
+      "command": "node",
+      "args": ["{mcp-server-diff-editor-path}/build/index.js"],
+      "env": {}
+    }
+  }
+}
