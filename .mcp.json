@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "diff-editor": {
+      "command": "node",
+      "args": ["/home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js"],
+      "env": {}
+    }
+  }
+}
