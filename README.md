@@ -92,10 +92,10 @@ npm start
 
 ```bash
 # Add to current project
-claude mcp add diff-editor node /home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js
+claude mcp add diff-editor node {mcp-server-diff-editor-path}/build/index.js
 
 # Add globally for all projects
-claude mcp add --user diff-editor node /home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js
+claude mcp add --user diff-editor node {mcp-server-diff-editor-path}/build/index.js
 
 # Verify installation
 claude mcp list
@@ -110,7 +110,7 @@ Create or update `.mcp.json` in your project directory:
   "mcpServers": {
     "diff-editor": {
       "command": "node",
-      "args": ["/home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js"],
+      "args": ["{mcp-server-diff-editor-path}/build/index.js"],
       "env": {}
     }
   }
@@ -216,7 +216,7 @@ case 'your-operation':
 **Server not found in Claude Code:**
 ```bash
 # Verify server path exists
-ls -la /home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js
+ls -la {mcp-server-diff-editor-path}/build/index.js
 
 # Rebuild if missing
 npm run build

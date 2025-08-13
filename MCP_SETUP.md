@@ -8,7 +8,7 @@ If you have Claude Code CLI installed, you can add this server directly:
 
 ```bash
 # Add the server (run from project directory)
-claude mcp add diff-editor node /home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js
+claude mcp add diff-editor node {mcp-server-diff-editor-path}/build/index.js
 
 # List configured servers
 claude mcp list
@@ -26,7 +26,7 @@ The `.mcp.json` file has already been created in this directory with the followi
   "mcpServers": {
     "diff-editor": {
       "command": "node",
-      "args": ["/home/btafoya/mcp-servers/mcp-server-diff-editor/build/index.js"],
+      "args": ["{mcp-server-diff-editor-path}/build/index.js"],
       "env": {}
     }
   }
